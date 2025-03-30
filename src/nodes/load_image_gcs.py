@@ -13,7 +13,7 @@ class LoadImageGCS:
     def INPUT_TYPES(s):
         input_dir = os.getenv("GCS_INPUT_DIR")
         try:
-            files = self.gcs_client.list_files(prefix=input_dir)
+            files = GoogleStorageClient().gcs_client.list_files(prefix=input_dir)
         except Exception as e:
             files = []
         return {"required":{"image": (sorted(files), {"image_upload": False})},}
