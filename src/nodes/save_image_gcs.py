@@ -6,18 +6,16 @@ from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 from comfy.cli_args import args
 
-from ..client_s3 import get_s3_instance
-S3_INSTANCE = get_s3_instance()
-
-
 class SaveImageGCS:
+
     def __init__(self):
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
         self.temp_dir = os.path.join(base_dir, "temp/")
-        self.s3_output_dir = os.getenv("S3_OUTPUT_DIR")
+        self.gcs_output_dir = os.getenv("GCS_OUTPUT_DIR")
         self.type = "output"
         self.prefix_append = ""
         self.compress_level = 4
+        self.gcs_client = GoogleStorageClient()
 
     @classmethod
     def INPUT_TYPES(s):
@@ -29,17 +27,17 @@ class SaveImageGCS:
                 }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("s3_image_paths",)
+    RETURN_NAMES = ("gcs_image_paths",)
     FUNCTION = "save_images"
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,)
-    CATEGORY = "ComfyS3"
+    CATEGORY = "ComfyGCS"
 
     def save_images(self, images, filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = S3_INSTANCE.get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
+        full_output_folder, filename, counter, subfolder, filename_prefix = self.gcs_client.get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
         results = list()
-        s3_image_paths = list()
+        gcs_image_paths = list()
         
         for image in images:
             i = 255. * image.cpu().numpy()
@@ -63,12 +61,12 @@ class SaveImageGCS:
                     # Save the image to the temporary file
                     img.save(temp_file_path, pnginfo=metadata, compress_level=self.compress_level)
 
-                    # Upload the temporary file to S3
-                    s3_path = os.path.join(full_output_folder, file)
-                    file_path = S3_INSTANCE.upload_file(temp_file_path, s3_path)
+                    # Upload the temporary file to GCS
+                    gcs_path = os.path.join(full_output_folder, file)
+                    file_path = self.gcs_client.upload_file(temp_file_path, gcs_path)
 
-                    # Add the s3 path to the s3_image_paths list
-                    s3_image_paths.append(file_path)
+                    # Add the GCS path to the GCS_image_paths list
+                    gcs_image_paths.append(file_path)
                     
                     # Add the result to the results list
                     results.append({
@@ -83,4 +81,4 @@ class SaveImageGCS:
                 if temp_file_path and os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
 
-        return { "ui": { "images": results },  "result": (s3_image_paths,) }
+        return { "ui": { "images": results },  "result": (gcs_image_paths,) }

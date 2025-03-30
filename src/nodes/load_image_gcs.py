@@ -2,30 +2,30 @@ import os
 import torch
 import numpy as np
 from PIL import Image, ImageOps, ImageSequence
-
-from ..client_s3 import get_s3_instance
-S3_INSTANCE = get_s3_instance()
-
+from ..client import GoogleStorageClient
 
 class LoadImageGCS:
+
+    def __init__(self):
+        self.gcs_client = GoogleStorageClient()
+
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = os.getenv("S3_INPUT_DIR")
+        input_dir = os.getenv("GCS_INPUT_DIR")
         try:
-            files = S3_INSTANCE.get_files(prefix=input_dir)
+            files = self.gcs_client.list_files(prefix=input_dir)
         except Exception as e:
             files = []
-        return {"required":
-                    {"image": (sorted(files), {"image_upload": False})},
-                }
+        return {"required":{"image": (sorted(files), {"image_upload": False})},}
     
-    CATEGORY = "ComfyS3"
+
+    CATEGORY = "ComfyUIGCS"
     RETURN_TYPES = ("IMAGE", "MASK")
     FUNCTION = "load_image"
     
     def load_image(self, image):
-        s3_path = os.path.join(os.getenv("S3_INPUT_DIR"), image)
-        image_path = S3_INSTANCE.download_file(s3_path=s3_path, local_path=f"input/{image}")
+        gcs_path = os.path.join(os.getenv("GCS_INPUT_DIR"), image)
+        image_path = self.gcs_client.download_file(gcs_path=gcs_path, local_path=f"input/{image}")
         
         img = Image.open(image_path)
         output_images = []
