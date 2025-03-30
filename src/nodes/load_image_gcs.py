@@ -9,43 +9,38 @@ class LoadImageGCS:
 
     @classmethod
     def INPUT_TYPES(s):
-        files = []
         input_dir = os.getenv("GCS_INPUT_DIR", "")
         input_bucket = os.getenv("GCS_BUCKET", "")
         input_project = os.getenv("GCS_PROJECT", "")
         gcp_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
-        try: 
-            logging.info(f"Listing files in GCS bucket: {input_dir}")
-            files = GoogleStorageClient().list_files(prefix=input_dir)
-        except Exception as e:
-            logging.error(f"Error listing files in GCS bucket: {e}")
-            files = []
         return {
             "required": {
-                "gcs_input_dir": ("STRING", { "multiline": False,"default": input_dir }),
+                "gcs_input_prefix": ("STRING", { "multiline": False,"default": input_dir }),
                 "gcs_bucket": ("STRING", { "multiline": False,"default": input_bucket }),
                 "gcs_project": ("STRING", { "multiline": False, "default": input_project }),
-                "image": (sorted(files), {"image_upload": False}),
             },
             "optional": {
                 "google_application_credentials": ("STRING", { "multiline": False, "default": gcp_credentials }),
             },
         }
-
-    @classmethod
-    def IS_CHANGED(s, gcs_input_dir, gcs_bucket, gcs_project, google_application_credentials):
-        return True
     
     CATEGORY = "ComfyGCS"
     RETURN_TYPES = ("IMAGE", )
     FUNCTION = "load_image"
     
-    def load_image(self, image, gcs_input_dir, gcs_bucket, gcs_project, google_application_credentials):
+    def load_image(self, gcs_input_prefix, gcs_bucket, gcs_project, google_application_credentials):
         
         client = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials=google_application_credentials)
-        gcs_path = os.path.join(gcs_input_dir, image)
-        image_path = client.download_file(gcs_path=gcs_path, local_path=f"input/{image}")
+        gcs_path = os.path.join(gcs_input_prefix, image)
+
+        files = client.list_files(prefix=gcs_input_prefix)
+        if not files:
+            raise ValueError(f"No files found in the specified GCS path: {gcs_input_prefix}")
         
+        file = files[0]
+        image = os.path.basename(file)
+        logging.info(f"Loading image: {image}")
+        image_path = client.download_file(gcs_path=image, local_path=f"input/{image}")
         img = Image.open(image_path)
         output_images = []
         output_masks = []

@@ -25,6 +25,7 @@ class GoogleStorageClient:
             self.bucket = self.client.bucket(bucket_name)
             logging.info(f"Google Storage Client initialized with bucket: {self.bucket_name}")
             self.initialized = True
+            self.last_input_values = None  # Store the last input values to detect changes
 
     def download_file(self, gcs_path, local_path):
         """
@@ -36,6 +37,7 @@ class GoogleStorageClient:
         blob = self.bucket.blob(gcs_path)
         blob.download_to_filename(local_path)
         logging.info(f"Downloaded {gcs_path} to {local_path}")
+        return local_path
 
     def get_save_path(self, filename_prefix, width, height):
         """
@@ -64,4 +66,25 @@ class GoogleStorageClient:
         blobs = self.client.list_blobs(self.bucket_name, prefix=prefix)
         return [blob.name for blob in blobs]
 
-    
+    def monitor_input_and_list_files(self, input_values):
+        """
+        Monitors changes in input values and triggers the list_files method if changes are detected.
+        :param input_values: Dictionary of input values to monitor.
+        """
+        if input_values != self.last_input_values:
+            logging.info("Input values changed, triggering list_files.")
+            self.last_input_values = input_values
+            prefix = input_values.get("prefix", None)
+            return self.list_files(prefix=prefix)
+        else:
+            logging.info("No changes in input values detected.")
+            return []
+
+    def handle_input_change(self, new_inputs):
+        """
+        Handles changes in required inputs and triggers file listing.
+        :param new_inputs: Dictionary of new input values.
+        """
+        logging.info("Handling input change.")
+        return self.monitor_input_and_list_files(new_inputs)
+
