@@ -1,0 +1,14 @@
+[project]
+name = "comfyui-google-storage"
+description = ""
+version = "1.0.0"
+license = { file = "LICENSE" }
+dependencies = ["google-cloud-storage"]
+
+[project.urls]
+Repository = "https://github.com/benmizrahi/ComfyGCS"
+
+[tool.comfy]
+PublisherId = "benmizrahi"
+DisplayName = "ComfyuiGCS"
+Icon = ""
