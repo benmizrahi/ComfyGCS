@@ -20,13 +20,16 @@ class GoogleStorageClient:
         if not hasattr(self, 'initialized'):  # Ensure __init__ runs only once
             logging.info("Initializing Google Storage Client")
             load_dotenv()
-            credentials=None
+            credentials = None
             if credentials_sa:
                 logging.info(f"Using service account credentials from: {credentials_sa}")
                 credentials = service_account.Credentials.from_service_account_file(credentials_sa)
+            else:
+                logging.info("Using Application Default Credentials")
+                credentials = service_account.Credentials.get_application_default()
             self.client = storage.Client(project=project, credentials=credentials)
             self.bucket = self.client.bucket(bucket_name)
-            logging.info(f"Google Storage Client initialized with bucket: {self.bucket_name}")
+            logging.info(f"Google Storage Client initialized with bucket: {bucket_name}")
             self.initialized = True
             self.last_input_values = None  # Store the last input values to detect changes
 
