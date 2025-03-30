@@ -25,16 +25,17 @@ class LoadImageGCS:
                 "gcs_input_dir": ("STRING", { "multiline": False,"default": input_dir }),
                 "gcs_bucket": ("STRING", { "multiline": False,"default": input_bucket }),
                 "gcs_project": ("STRING", { "multiline": False, "default": input_project }),
-                "google_application_credentials": ("STRING", {"multiline": False,"default": gcp_credentials }),
                 "image": (sorted(files), {"image_upload": False}),
-            }
+            },
+            "optional": {
+                "google_application_credentials": ("STRING", { "multiline": False, "default": gcp_credentials }),
+            },
         }
 
     @classmethod
     def IS_CHANGED(s, gcs_input_dir, gcs_bucket, gcs_project, google_application_credentials):
         return True
-
-
+    
     CATEGORY = "ComfyGCS"
     RETURN_TYPES = ("IMAGE", )
     FUNCTION = "load_image"
