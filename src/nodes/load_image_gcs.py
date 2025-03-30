@@ -9,6 +9,7 @@ class LoadImageGCS:
 
     @classmethod
     def INPUT_TYPES(s):
+        files = []
         input_dir = os.getenv("GCS_INPUT_DIR", "")
         input_bucket = os.getenv("GCS_BUCKET", "")
         input_project = os.getenv("GCS_PROJECT", "")
@@ -28,6 +29,11 @@ class LoadImageGCS:
                 "image": (sorted(files), {"image_upload": False}),
             }
         }
+
+    @classmethod
+    def IS_CHANGED(s, gcs_input_dir, gcs_bucket, gcs_project, google_application_credentials):
+        return True
+
 
     CATEGORY = "ComfyGCS"
     RETURN_TYPES = ("IMAGE", )
