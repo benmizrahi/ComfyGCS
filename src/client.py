@@ -1,7 +1,6 @@
 import os
 import logging
 from google.cloud import storage
-
 from dotenv import load_dotenv
 
 class GoogleStorageClient:
@@ -28,6 +27,7 @@ class GoogleStorageClient:
 
             self.client = storage.Client(credentials=sa_file)
             self.bucket = self.client.bucket(bucket_name)
+            logging.info(f"Google Storage Client initialized with bucket: {self.bucket_name}")
             self.initialized = True
 
     def download_file(self, gcs_path, local_path):
@@ -36,9 +36,10 @@ class GoogleStorageClient:
         :param gcs_path: Path of the file in Google Cloud Storage.
         :param local_path: Local path to save the downloaded file.
         """
+        logging.info(f"Downloading {gcs_path} to {local_path}")
         blob = self.bucket.blob(gcs_path)
         blob.download_to_filename(local_path)
-        print(f"Downloaded {gcs_path} to {local_path}")
+        logging.info(f"Downloaded {gcs_path} to {local_path}")
 
     def get_save_path(self, filename_prefix, width, height):
         """
@@ -50,6 +51,7 @@ class GoogleStorageClient:
         """
         # Implement logic to generate save path
         # This is a placeholder implementation
+        logging.info(f"Generating save path for {filename_prefix} with dimensions {width}x{height}")
         full_output_folder = os.path.join(self.bucket_name, "output")
         filename = f"{filename_prefix}_{width}x{height}"
         counter = 0
@@ -62,6 +64,7 @@ class GoogleStorageClient:
         :param prefix: Prefix to filter the files.
         :return: List of file names.
         """
+        logging.info(f"Listing files in bucket: {self.bucket_name} with prefix: {prefix}")
         blobs = self.client.list_blobs(self.bucket_name, prefix=prefix)
         return [blob.name for blob in blobs]
 
