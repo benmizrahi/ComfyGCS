@@ -22,6 +22,7 @@ class GoogleStorageClient:
             load_dotenv()
             credentials=None
             if credentials_sa:
+                logging.info(f"Using service account credentials from: {credentials_sa}")
                 credentials = service_account.Credentials.from_service_account_file(credentials_sa)
             self.client = storage.Client(project=project, credentials=credentials)
             self.bucket = self.client.bucket(bucket_name)
