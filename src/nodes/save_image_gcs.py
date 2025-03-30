@@ -21,10 +21,10 @@ class SaveImageGCS:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
-            "images": ("IMAGE", ),
-            "filename_prefix": ("STRING", {"default": "Image"})},
-            "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"
-            },
+                "images": ("IMAGE", ),
+                "filename_prefix": ("STRING", {"default": "Image"})},
+                "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"
+                },
                 }
 
     RETURN_TYPES = ("STRING",)
