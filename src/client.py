@@ -1,8 +1,10 @@
 import os
 import logging
+import google.auth
 from google.cloud import storage
 from google.oauth2 import service_account
 from dotenv import load_dotenv
+
 
 class GoogleStorageClient:
     _instance = None  # Class-level attribute to store the singleton instance
@@ -26,7 +28,8 @@ class GoogleStorageClient:
                 credentials = service_account.Credentials.from_service_account_file(credentials_sa)
             else:
                 logging.info("Using Application Default Credentials")
-                credentials = service_account.Credentials.get_application_default()
+                credentials = google.auth.default()
+            logging.info("Credentials loaded successfully")
             self.client = storage.Client(project=project, credentials=credentials)
             self.bucket = self.client.bucket(bucket_name)
             logging.info(f"Google Storage Client initialized with bucket: {bucket_name}")
