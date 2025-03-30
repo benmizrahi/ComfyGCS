@@ -10,5 +10,5 @@ Repository = "https://github.com/benmizrahi/ComfyGCS"
 
 [tool.comfy]
 PublisherId = "benmizrahi"
-DisplayName = "ComfyuiGCS"
+DisplayName = "ComfyGCS"
 Icon = ""
