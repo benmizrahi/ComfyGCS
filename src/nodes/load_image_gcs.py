@@ -38,7 +38,7 @@ class LoadImageGCS:
         file = files[0]
         image = os.path.basename(file)
         logging.info(f"Loading image: {image}")
-        image_path = client.download_file(gcs_path=image, local_path=f"input/{image}")
+        image_path = client.download_file( gcs_path=image, local_path=f"input/{image}")
         img = Image.open(image_path)
         output_images = []
         output_masks = []

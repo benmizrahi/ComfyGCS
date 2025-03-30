@@ -31,6 +31,7 @@ class GoogleStorageClient:
                 credentials = google.auth.default()
             logging.info("Credentials loaded successfully")
             self.client = storage.Client(project=project, credentials=credentials)
+            self.bucket_name = bucket_name
             self.bucket = self.client.bucket(bucket_name)
             logging.info(f"Google Storage Client initialized with bucket: {bucket_name}")
             self.initialized = True
