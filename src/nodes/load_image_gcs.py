@@ -15,6 +15,7 @@ class LoadImageGCS:
         input_dir = os.getenv("GCS_INPUT_DIR", "")
         input_bucket = os.getenv("GCS_BUCKET", "")
         input_project = os.getenv("GCS_PROJECT", "")
+        gcp_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
         try:
             logging.info(f"Listing files in GCS bucket: {input_dir}")
             files = GoogleStorageClient().gcs_client.list_files(prefix=input_dir)
@@ -27,6 +28,7 @@ class LoadImageGCS:
                 "GCS_INPUT_DIR": (input_dir, {"type": "string"}),
                 "GCS_BUCKET": (input_bucket, {"type": "string"}),
                 "GCS_PROJECT": (input_project, {"type": "string"}),
+                "GOOGLE_APPLICATION_CREDENTIALS": (gcp_credentials, {"type": "string"}),
             }
         }
 
