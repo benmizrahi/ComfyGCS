@@ -19,7 +19,7 @@ class LoadImageGCS:
         return {"required":{"image": (sorted(files), {"image_upload": False})},}
     
 
-    CATEGORY = "ComfyUIGCS"
+    CATEGORY = "ComfyGCS"
     RETURN_TYPES = ("IMAGE", "MASK")
     FUNCTION = "load_image"
     

@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 from comfy.cli_args import args
+from ..client import GoogleStorageClient
 
 class SaveImageGCS:
 
