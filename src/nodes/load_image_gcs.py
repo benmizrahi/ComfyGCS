@@ -12,15 +12,23 @@ class LoadImageGCS:
 
     @classmethod
     def INPUT_TYPES(s):
-        input_dir = os.getenv("GCS_INPUT_DIR")
+        input_dir = os.getenv("GCS_INPUT_DIR", "")
+        input_bucket = os.getenv("GCS_BUCKET", "")
+        input_project = os.getenv("GCS_PROJECT", "")
         try:
             logging.info(f"Listing files in GCS bucket: {input_dir}")
             files = GoogleStorageClient().gcs_client.list_files(prefix=input_dir)
         except Exception as e:
             logging.error(f"Error listing files in GCS bucket: {e}")
             files = []
-        return {"required":{"image": (sorted(files), {"image_upload": False})},}
-    
+        return {
+            "required": {
+                "image": (sorted(files), {"image_upload": False}),
+                "GCS_INPUT_DIR": (input_dir, {"type": "string"}),
+                "GCS_BUCKET": (input_bucket, {"type": "string"}),
+                "GCS_PROJECT": (input_project, {"type": "string"}),
+            }
+        }
 
     CATEGORY = "ComfyGCS"
     RETURN_TYPES = ("IMAGE", "MASK")
