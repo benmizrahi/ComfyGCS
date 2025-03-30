@@ -1,9 +1,9 @@
 [project]
 name = "comfyui-google-storage"
 description = ""
-version = "1.0.9"
+version = "1.0.10"
 license = { file = "LICENSE" }
-dependencies = ["google-cloud-storage","python-dotenv"]
+dependencies = ["google-cloud-storage","python-dotenv","google-auth"]
 
 [project.urls]
 Repository = "https://github.com/benmizrahi/ComfyGCS"

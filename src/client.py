@@ -1,6 +1,7 @@
 import os
 import logging
 from google.cloud import storage
+from google.oauth2 import service_account
 from dotenv import load_dotenv
 
 class GoogleStorageClient:
@@ -11,21 +12,16 @@ class GoogleStorageClient:
             cls._instance = super(GoogleStorageClient, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, bucket_name=None):
+    def __init__(self, bucket_name=None, project=None, credentials_sa=None):
         """
         Initialize the Google Storage Client.
         :param bucket_name: Name of the Google Cloud Storage bucket.
         """
         if not hasattr(self, 'initialized'):  # Ensure __init__ runs only once
+            logging.info("Initializing Google Storage Client")
             load_dotenv()
-            sa_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-            if not sa_file:
-                logging.error("GOOGLE_APPLICATION_CREDENTIALS environment variable is not set USING ADC.")
-            self.bucket_name = bucket_name or os.getenv("GCS_BUCKET_NAME")
-            if not self.bucket_name:
-                raise ValueError("GCS_BUCKET_NAME environment variable is not set.")
-
-            self.client = storage.Client(credentials=sa_file)
+            credentials = service_account.Credentials.from_service_account_file(credentials_sa) if credentials_sa else None
+            self.client = storage.Client(project=project, credentials=credentials)
             self.bucket = self.client.bucket(bucket_name)
             logging.info(f"Google Storage Client initialized with bucket: {self.bucket_name}")
             self.initialized = True
