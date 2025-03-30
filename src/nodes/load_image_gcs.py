@@ -24,11 +24,27 @@ class LoadImageGCS:
             files = []
         return {
             "required": {
-                "image": (sorted(files), {"image_upload": False}),
-                "GCS_INPUT_DIR": (input_dir, {"type": "string"}),
-                "GCS_BUCKET": (input_bucket, {"type": "string"}),
-                "GCS_PROJECT": (input_project, {"type": "string"}),
-                "GOOGLE_APPLICATION_CREDENTIALS": (gcp_credentials, {"type": "string"}),
+            "image": (sorted(files), {"image_upload": False}),
+            "GCS_INPUT_DIR": (input_dir, {
+                "multiline": False,
+                "default": input_dir,
+                "lazy": True
+            }),
+            "GCS_BUCKET": (input_bucket, {
+                "multiline": False,
+                "default": input_bucket,
+                "lazy": True
+            }),
+            "GCS_PROJECT": (input_project, {
+                "multiline": False,
+                "default": input_project,
+                "lazy": True
+            }),
+            "GOOGLE_APPLICATION_CREDENTIALS": (gcp_credentials, {
+                "multiline": False,
+                "default": gcp_credentials,
+                "lazy": True
+            }),
             }
         }
 
