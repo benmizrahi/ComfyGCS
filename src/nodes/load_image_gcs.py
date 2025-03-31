@@ -31,7 +31,7 @@ class LoadImageGCS:
     def load_image(self, gcs_input_prefix, gcs_bucket, gcs_project, google_application_credentials):
         
         client = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials)
-        image_path = client.download_file( gcs_path=image, local_path=f"input/{image}")
+        image_path = client.download_file( gcs_path=gcs_input_prefix, local_path=f"input/{gcs_input_prefix}")
         img = Image.open(image_path)
         output_images = []
         output_masks = []
