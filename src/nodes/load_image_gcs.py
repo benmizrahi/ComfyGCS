@@ -31,13 +31,6 @@ class LoadImageGCS:
     def load_image(self, gcs_input_prefix, gcs_bucket, gcs_project, google_application_credentials):
         
         client = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials)
-        files = client.list_files(prefix=gcs_input_prefix)
-        logging.info(f"Files found in GCS: {files}")
-        if not files:
-            raise ValueError(f"No files found in the specified GCS path: {gcs_input_prefix}")
-        file = files[0]
-        image = os.path.basename(file)
-        logging.info(f"Loading image: {image}")
         image_path = client.download_file( gcs_path=image, local_path=f"input/{image}")
         img = Image.open(image_path)
         output_images = []
