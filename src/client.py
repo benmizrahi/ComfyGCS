@@ -2,7 +2,6 @@ import os
 import logging
 import google.auth
 from google.cloud import storage
-from google.oauth2 import service_account
 from dotenv import load_dotenv
 
 
@@ -25,12 +24,8 @@ class GoogleStorageClient:
             credentials = None
             if credentials_sa:
                 logging.info(f"Using service account credentials from: {credentials_sa}")
-                credentials = service_account.Credentials.from_service_account_file(credentials_sa)
-            else:
-                logging.info("Using Application Default Credentials")
-                credentials = google.auth.default()
-            logging.info("Credentials loaded successfully")
-            self.client = storage.Client(project=project, credentials=credentials)
+                credentials = google.auth.load_credentials_from_file(credentials_sa)
+            self.client = storage.Client(project=project)
             self.bucket_name = bucket_name
             self.bucket = self.client.bucket(bucket_name)
             logging.info(f"Google Storage Client initialized with bucket: {bucket_name}")
@@ -98,3 +93,14 @@ class GoogleStorageClient:
         logging.info("Handling input change.")
         return self.monitor_input_and_list_files(new_inputs)
 
+    def upload_file(self, local_path, gcs_path):
+        """
+        Uploads a file from local path to Google Cloud Storage.
+        :param local_path: Local path of the file to upload.
+        :param gcs_path: Path in Google Cloud Storage where the file will be uploaded.
+        """
+        logging.info(f"Uploading {local_path} to {gcs_path}")
+        blob = self.bucket.blob(gcs_path)
+        blob.upload_from_filename(local_path)
+        logging.info(f"Uploaded {local_path} to {gcs_path}")
+        return gcs_path

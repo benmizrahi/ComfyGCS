@@ -1,4 +1,3 @@
-import logging
 import os
 import torch
 import numpy as np
@@ -12,7 +11,7 @@ class LoadImageGCS:
         input_dir = os.getenv("GCS_INPUT_DIR", "")
         input_bucket = os.getenv("GCS_BUCKET", "")
         input_project = os.getenv("GCS_PROJECT", "")
-        gcp_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
+        gcp_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_PATH", "")
         return {
             "required": {
                 "gcs_input_prefix": ("STRING", { "multiline": False,"default": input_dir }),
@@ -20,7 +19,7 @@ class LoadImageGCS:
                 "gcs_project": ("STRING", { "multiline": False, "default": input_project }),
             },
             "optional": {
-                "google_application_credentials": ("STRING", { "multiline": False, "default": gcp_credentials }),
+                "google_application_credentials_file": ("STRING", { "multiline": False, "default": gcp_credentials }),
             },
         }
     
@@ -28,10 +27,11 @@ class LoadImageGCS:
     RETURN_TYPES = ("IMAGE", )
     FUNCTION = "load_image"
     
-    def load_image(self, gcs_input_prefix, gcs_bucket, gcs_project, google_application_credentials):
+    def load_image(self, gcs_input_prefix, gcs_bucket, gcs_project, google_application_credentials_path):
         
-        client = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials)
-        image_path = client.download_file( gcs_path=gcs_input_prefix, local_path=f"input/{gcs_input_prefix}")
+        client = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials_path)
+        file_name = gcs_input_prefix.split("/")[-1]
+        image_path = client.download_file( gcs_path=gcs_input_prefix, local_path=f"input/{file_name}")
         img = Image.open(image_path)
         output_images = []
         output_masks = []

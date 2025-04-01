@@ -4,7 +4,6 @@ import tempfile
 import numpy as np
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
-from comfy.cli_args import args
 from ..client import GoogleStorageClient
 
 class SaveImageGCS:
@@ -16,15 +15,14 @@ class SaveImageGCS:
         self.type = "output"
         self.prefix_append = ""
         self.compress_level = 4
-        self.gcs_client = GoogleStorageClient()
 
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": {
+        return {
+                "required": {
                 "images": ("IMAGE", ),
                 "filename_prefix": ("STRING", {"default": "Image"})},
-                "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"
-                },
+                "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO" },
                 }
 
     RETURN_TYPES = ("STRING",)
@@ -36,22 +34,13 @@ class SaveImageGCS:
 
     def save_images(self, images, filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = self.gcs_client.get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
+        full_output_folder, filename, counter, subfolder, filename_prefix = GoogleStorageClient().get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
         results = list()
         gcs_image_paths = list()
         
         for image in images:
             i = 255. * image.cpu().numpy()
-            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-            metadata = None
-            if not args.disable_metadata:
-                metadata = PngInfo()
-                if prompt is not None:
-                    metadata.add_text("prompt", json.dumps(prompt))
-                if extra_pnginfo is not None:
-                    for x in extra_pnginfo:
-                        metadata.add_text(x, json.dumps(extra_pnginfo[x]))
-            
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))            
             file = f"{filename}_{counter:05}_.png"
             temp_file = None
             try:
@@ -60,11 +49,11 @@ class SaveImageGCS:
                     temp_file_path = temp_file.name
                     
                     # Save the image to the temporary file
-                    img.save(temp_file_path, pnginfo=metadata, compress_level=self.compress_level)
+                    img.save(temp_file_path, compress_level=self.compress_level)
 
                     # Upload the temporary file to GCS
                     gcs_path = os.path.join(full_output_folder, file)
-                    file_path = self.gcs_client.upload_file(temp_file_path, gcs_path)
+                    file_path = GoogleStorageClient().upload_file(temp_file_path, gcs_path)
 
                     # Add the GCS path to the GCS_image_paths list
                     gcs_image_paths.append(file_path)

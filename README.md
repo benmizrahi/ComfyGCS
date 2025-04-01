@@ -20,7 +20,7 @@ pip install comfygcs
 
 To configure ComfyGCS, set the following environment variables:
 
-- **`GOOGLE_APPLICATION_CREDENTIALS`** (optional): Path to the Google Cloud service account key file.  
+- **`GOOGLE_APPLICATION_CREDENTIALS_PATH`** (optional): Path to the Google Cloud service account key file.  
     Used for authentication when interacting with Google Cloud services. If not provided, the application will attempt to use the default credentials available in the environment.
 
 - **`GOOGLE_PROJECT_ID`** (required): The ID of the Google Cloud project.  
