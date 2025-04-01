@@ -29,23 +29,6 @@ To configure ComfyGCS, set the following environment variables:
 - **`GOOGLE_BUCKET`** (required): The name of the Google Cloud Storage bucket.  
     Required for accessing or storing objects in the specified bucket.
 
-## Usage
-
-Here's a quick example to get started:
-
-```python
-from comfygcs import GCSClient
-
-# Initialize the client
-client = GCSClient(bucket_name="your-bucket-name")
-
-# Upload a file
-client.upload_file("local-file.txt", "remote-file.txt")
-
-# Download a file
-client.download_file("remote-file.txt", "local-file.txt")
-```
-
 ## Requirements
 
 - Python 3.7 or higher
