@@ -35,6 +35,7 @@ class SaveImageGCS:
     def save_images(self, images, filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
         filename_prefix += self.prefix_append
         full_output_folder, filename, counter, subfolder, filename_prefix = GoogleStorageClient().get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
+        print(f"Saving images to {full_output_folder} with prefix {filename_prefix}")
         results = list()
         gcs_image_paths = list()
         

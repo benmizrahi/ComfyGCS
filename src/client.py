@@ -55,11 +55,10 @@ class GoogleStorageClient:
         # Implement logic to generate save path
         # This is a placeholder implementation
         logging.info(f"Generating save path for {filename_prefix} with dimensions {width}x{height}")
-        full_output_folder = os.path.join(self.bucket_name, "output")
         filename = f"{filename_prefix}_{width}x{height}"
         counter = 0
         subfolder = ""
-        return full_output_folder, filename, counter, subfolder, filename_prefix
+        return "output", filename, counter, subfolder, filename_prefix
 
     def list_files(self, prefix=None):
         """
