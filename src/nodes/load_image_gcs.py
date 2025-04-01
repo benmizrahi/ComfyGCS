@@ -27,7 +27,7 @@ class LoadImageGCS:
     RETURN_TYPES = ("IMAGE", )
     FUNCTION = "load_image"
     
-    def load_image(self, gcs_input_prefix, gcs_bucket, gcs_project, google_application_credentials_path):
+    def load_image(self, gcs_input_prefix, gcs_bucket, gcs_project, google_application_credentials_path=None):
         
         client = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials_path)
         file_name = gcs_input_prefix.split("/")[-1]
