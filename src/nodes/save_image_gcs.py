@@ -18,10 +18,19 @@ class SaveImageGCS:
 
     @classmethod
     def INPUT_TYPES(s):
+        gcp_credentials = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_PATH", "")
+        input_bucket = os.getenv("GCS_BUCKET", "")
+        input_project = os.getenv("GCS_PROJECT", "")
         return {
                 "required": {
-                "images": ("IMAGE", ),
-                "filename_prefix": ("STRING", {"default": "Image"})},
+                    "gcs_bucket": ("STRING", { "multiline": False,"default": input_bucket }),
+                    "gcs_project": ("STRING", { "multiline": False, "default": input_project }),
+                    "images": ("IMAGE", ),
+                        "filename_prefix": ("STRING", {"default": "Image"})
+                    },
+                "optional": {
+                "google_application_credentials_file": ("STRING", { "multiline": False, "default": gcp_credentials }),
+            },
                 "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO" },
                 }
 
@@ -32,9 +41,9 @@ class SaveImageGCS:
     OUTPUT_IS_LIST = (True,)
     CATEGORY = "ComfyGCS"
 
-    def save_images(self, images, filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
+    def save_images(self, images, gcs_bucket, gcs_project,filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None,google_application_credentials_file=None):
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = GoogleStorageClient().get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
+        full_output_folder, filename, counter, subfolder, filename_prefix = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials_file).get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
         print(f"Saving images to {full_output_folder} with prefix {filename_prefix}")
         results = list()
         gcs_image_paths = list()
@@ -54,7 +63,7 @@ class SaveImageGCS:
 
                     # Upload the temporary file to GCS
                     gcs_path = os.path.join(full_output_folder, file)
-                    file_path = GoogleStorageClient().upload_file(temp_file_path, gcs_path)
+                    file_path = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials_file).upload_file(temp_file_path, gcs_path)
 
                     # Add the GCS path to the GCS_image_paths list
                     gcs_image_paths.append(file_path)

@@ -8,13 +8,6 @@ ComfyGCS is a robust read/write plugin for Google Cloud Storage, designed to sim
 - Easy-to-use read and write operations.
 - Lightweight and efficient.
 
-## Installation
-
-To install ComfyGCS, use the following command:
-
-```bash
-pip install comfygcs
-```
 
 ### Environment Variables
 
