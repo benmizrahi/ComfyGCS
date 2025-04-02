@@ -6,31 +6,24 @@ from dotenv import load_dotenv
 
 
 class GoogleStorageClient:
-    _instance = None  # Class-level attribute to store the singleton instance
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super(GoogleStorageClient, cls).__new__(cls)
-        return cls._instance
 
     def __init__(self, bucket_name=None, project=None, credentials_sa=None):
         """
         Initialize the Google Storage Client.
         :param bucket_name: Name of the Google Cloud Storage bucket.
         """
-        if not hasattr(self, 'initialized'):  # Ensure __init__ runs only once
-            logging.info("Initializing Google Storage Client")
-            load_dotenv()
-            credentials = None
-            if credentials_sa:
-                logging.info(f"Using service account credentials from: {credentials_sa}")
-                credentials = google.auth.load_credentials_from_file(credentials_sa)
-            self.client = storage.Client(project=project)
-            self.bucket_name = bucket_name
-            self.bucket = self.client.bucket(bucket_name)
-            logging.info(f"Google Storage Client initialized with bucket: {bucket_name}")
-            self.initialized = True
-            self.last_input_values = None  # Store the last input values to detect changes
+        logging.info("Initializing Google Storage Client")
+        load_dotenv()
+        credentials = None
+        if credentials_sa:
+            logging.info(f"Using service account credentials from: {credentials_sa}")
+            credentials = google.auth.load_credentials_from_file(credentials_sa)
+        self.client = storage.Client(project=project)
+        self.bucket_name = bucket_name
+        self.bucket = self.client.bucket(bucket_name)
+        logging.info(f"Google Storage Client initialized with bucket: {bucket_name}")
+        self.initialized = True
+        self.last_input_values = None  # Store the last input values to detect changes
 
     def download_file(self, gcs_path, local_path):
         """

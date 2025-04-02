@@ -42,8 +42,9 @@ class SaveImageGCS:
     CATEGORY = "ComfyGCS"
 
     def save_images(self, images, gcs_bucket, gcs_project,filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None,google_application_credentials_file=None):
+        gcp = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials_file)
         filename_prefix += self.prefix_append
-        full_output_folder, filename, counter, subfolder, filename_prefix = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials_file).get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
+        full_output_folder, filename, counter, subfolder, filename_prefix = gcp.get_save_path(filename_prefix, images[0].shape[1], images[0].shape[0])
         print(f"Saving images to {full_output_folder} with prefix {filename_prefix}")
         results = list()
         gcs_image_paths = list()
@@ -63,7 +64,7 @@ class SaveImageGCS:
 
                     # Upload the temporary file to GCS
                     gcs_path = os.path.join(full_output_folder, file)
-                    file_path = GoogleStorageClient(bucket_name=gcs_bucket, project=gcs_project, credentials_sa=google_application_credentials_file).upload_file(temp_file_path, gcs_path)
+                    file_path = gcp.upload_file(temp_file_path, gcs_path)
 
                     # Add the GCS path to the GCS_image_paths list
                     gcs_image_paths.append(file_path)
